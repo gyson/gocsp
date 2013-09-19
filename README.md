@@ -1,4 +1,8 @@
-tcsp-js
-=======
+## Communication Sequencial Processes in Javascript
 
-Table-based communicating sequential processes
+Bring golang-like CSP channel to Javascript by using generator (ES6)
+
+
+
+
+
