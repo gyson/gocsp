@@ -1,7 +1,7 @@
 var csp = require("../src/csp.js");
 
 var spawn  = csp.spawn
-  ,	send   = csp.send
+  , send   = csp.send
   , take   = csp.take
   , select = csp.select
   , sleep  = csp.sleep;
@@ -54,7 +54,7 @@ function* main() {
 	spawn( ping_pong("ping", "pong") );
 	spawn( ping_pong("pong", "ping") );
 
-	send("ping", 20);
+	send("ping", 6);
 }
 
 spawn( main() );

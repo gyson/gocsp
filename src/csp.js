@@ -61,13 +61,9 @@ function handle_request(gid, result) {
 		}
 		waiting[chan].push(gid);
 
-		if (request.type == TAKE) {
+		gens[gid].status = request.type;
 
-			gens[gid].status = TAKE;
-		
-		} else {
-
-			gens[gid].status = TAKE_WAIT;
+		if (request.type == TAKE_WAIT) {
 
 			// need to wait
 			gens[gid].timeout = setTimeout(function () {
@@ -112,12 +108,9 @@ function handle_request(gid, result) {
 			gens[gid].watching.push(chans[i]);
 		}
 
-		if (request.type == SELECT) {
+		gens[gid].status = request.type;
 
-			gens[gid].status = SELECT;
-
-		} else {
-			gens[gid].status = SELECT_WAIT;
+		if (request.type == SELECT_WAIT) {
 		
 			gens[gid].timeout = setTimeout(function () {
 				
@@ -151,7 +144,7 @@ function handle_request(gid, result) {
 var gid_counter = 0; // used to generate unique generator id
 
 /*
- * @spawn is used to create new active generator
+ * spawn() is used to create new active generator
  */
 function spawn(generator) {
 
@@ -165,9 +158,7 @@ function spawn(generator) {
 }
 
 /*
- * @send: is the trigger to active the idle generators
- * 
- *
+ * send() is the trigger to active the idle generators
  */
 function send(name, item) {
 
@@ -187,33 +178,26 @@ function send(name, item) {
 	switch (gens[gid].status) {
 
 	case TAKE_WAIT:
-
+		
 		// clear setTimeout
 		clearTimeout(gens[gid].timeout);
-
-	case SELECT:
-
-		// clear watching list
-		for (var i = 0; i < gens[gid].watching.length; i++) {
-			waiting[gens[gid].watching[i]].splice(waiting[gens[gid].watching[i]].indexOf(gid), 1);
-		}
-
-		// delete watching list
-		delete gens[gid].watching;
+		break;
 
 	case SELECT_WAIT:
+		
+		// clear setTimeout
+		clearTimeout(gens[gid].timeout);
+
+		// don't break, continue to clear watching list
+	case SELECT:
+		if (gens[gid].watching == null) break;
 
 		// clear watching list
 		for (var i = 0; i < gens[gid].watching.length; i++) {
 			waiting[gens[gid].watching[i]].splice(waiting[gens[gid].watching[i]].indexOf(gid), 1);
 		}
-
 		// delete watching list
 		delete gens[gid].watching;
-
-		// clear setTimeout
-		clearTimeout(gens[gid].timeout);
-
 	}
 
 	handle_request(gid, gens[gid].gen.send(item));

@@ -1,7 +1,7 @@
 var csp = require("../src/csp.js");
 
 var spawn  = csp.spawn
-  ,	send   = csp.send
+  , send   = csp.send
   , take   = csp.take
   , select = csp.select
   , sleep  = csp.sleep;
