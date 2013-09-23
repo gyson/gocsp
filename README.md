@@ -68,14 +68,20 @@ console.log("** all done! **");
 
 #### spawn( generator_iterator_object )
 
+Create a new coroutine with generator_iterator_object. The coroutine will be destroyed when function calls "return".
+
 ```js
 function* gen(name) {
 	console.log(name, " is inside generator!");
+
+	if (name == "Orz") return; // quit
 }
-csp.spawn( gen("Orz") );
+csp.spawn( gen("Orz") ); // create a new coroutine
 ```
 	
 #### send( channel, item_to_send )
+
+Send an item to the channel. This action will never be blocked.
 
 ```js
 // channel is identified by string or number
@@ -85,6 +91,8 @@ csp.send(chan, "item to send");
 ```
 
 #### yield take( channel )
+
+Block until get an item from the channel.
 
 ```js
 csp.spawn(function* () {
@@ -96,6 +104,8 @@ csp.spawn(function* () {
 
 #### yield take( channel, max_time_to_wait )
 
+Wait to get an item from channel. If the coroutine cannot get item after max_time_to_wait, it will get a "null" instead.
+
 ```js
 csp.spawn(function* () {
 	while (true) {
@@ -106,6 +116,8 @@ csp.spawn(function* () {
 
 #### yield select( list_of_channels )
 
+Block until a value is sent to one of channels in list_of_channels.
+
 ```js
 csp.spawn(function* () {
 	while (true) {
@@ -115,6 +127,8 @@ csp.spawn(function* () {
 ```
 #### yield select( list_of_channels, max_time_to_wait )
 
+Block until a value is sent to one of channels in list_of_channels. If the coroutine cannot get item after max_time_to_wait, it will get a "null" instead.
+
 ```js
 csp.spawn(function* () {
 	while (true) {
@@ -123,7 +137,9 @@ csp.spawn(function* () {
 }());
 ```
 
-#### yield sleep( time_in_milisecond )
+#### yield sleep( time_in_millisecond )
+
+The coroutine will sleep for a while (time_in_milliseconds).
 
 ```js
 function* i_am_lazy() {
