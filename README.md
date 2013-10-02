@@ -30,23 +30,23 @@ var csp = require("./src/csp.js");
 function* ping_pong(self, partner) {
 	var n = 1;
 	while (n > 0) {
-		n = yield csp.take(self);
+		n = yield csp.take(self);    // take item from "self" channel
 		
 		console.log(self, "get", n);
 		
-		csp.send(partner, n - 1);
+		csp.send(partner, n - 1);    // send item to "partner" channel
 	}
 	console.log(self, "done!!!");
 }
 
 function* main() {
-	spawn( ping_pong("ping", "pong") );
-	spawn( ping_pong("pong", "ping") );
+	csp.spawn( ping_pong("ping", "pong") );
+	csp.spawn( ping_pong("pong", "ping") );
 
 	csp.send("ping", 6);
 }
 
-csp.spawn( main() );
+csp.spawn( main() ); // start main()
 
 console.log("** all done! **");
 ```
@@ -74,9 +74,9 @@ Create a new coroutine with generator_iterator_object. The coroutine will be des
 function* gen(name) {
 	console.log(name, " is inside generator!");
 
-	if (name == "Orz") return; // quit
+	if (name == "my name") return; // use "return" to quit the generator
 }
-csp.spawn( gen("Orz") ); // create a new coroutine
+csp.spawn( gen("my name") ); // create a new coroutine
 ```
 	
 #### send( channel, item_to_send )
