@@ -158,3 +158,6 @@ csp.spawn( i_am_lazy() );
 * http://golang.org/
 * http://en.wikipedia.org/wiki/Communicating_sequential_processes
 
+## License
+
+MIT
