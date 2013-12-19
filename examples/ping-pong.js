@@ -1,10 +1,6 @@
 
-// let { spawn, Channel } = require("../src/csp.js");
-
-var csp = require("../src/csp.js");
-
-var spawn = csp.spawn;
-var Channel = csp.Channel;
+var spawn   = require("../src/csp.js").spawn;
+var Channel = require("../src/csp.js").Channel;
 
 var ping = new Channel();
 var pong = new Channel();
@@ -24,3 +20,6 @@ spawn(ping_pong(pong, ping, "pong"))
 ping.send(20)
 
 console.log("** all done **");
+
+
+

@@ -1,8 +1,6 @@
 
-var csp = require("../src/csp.js");
-
-var spawn  = csp.spawn
-  , Channel = csp.Channel;
+var spawn   = require("../src/csp.js").spawn
+var Channel = require("../src/csp.js").Channel;
 
 
 var chan = new Channel();
@@ -34,3 +32,5 @@ process.openStdin().addListener("data", function(d) {
 	chan.send(parseInt(d));
 
 });
+
+
