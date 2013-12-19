@@ -68,7 +68,7 @@ function* gen(name) {
 
 	if (name == "my name") return; // use "return" to quit the generator
 }
-csp.spawn( gen("my name") ); // create a new coroutine
+spawn( gen("my name") ); // create a new coroutine
 ```
 	
 #### Channel.send( obj_to_send )

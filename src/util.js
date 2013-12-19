@@ -58,8 +58,8 @@ var fs = {
 }
 
 module.exports = {
-	fs:    fs,
-	sleep: sleep
+    fs:    fs,
+    sleep: sleep
 }
 
 
