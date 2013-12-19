@@ -1,21 +1,14 @@
+
+// let { sleep, spawn } = require("../src/csp.js")
+
 var csp = require("../src/csp.js");
 
-var spawn  = csp.spawn
-  , send   = csp.send
-  , take   = csp.take
-  , select = csp.select
-  , sleep  = csp.sleep;
+var sleep = csp.sleep;
+var spawn = csp.spawn;
 
-
-function* ok_to_sleep(i, to_print) {
-	var sum = 0;
-	while (true) {
-		console.log(to_print, sum++);
-		yield sleep(i * 1000);	
-	}
-}
-
-spawn( ok_to_sleep(1, "***") );
-spawn( ok_to_sleep(2, "*********") );
-spawn( ok_to_sleep(4, "***************") );
-
+spawn(function*() {
+    for (var i = 0; i < 20; i++) {
+        yield* sleep(1000);
+        console.log(i);
+    }
+}());

@@ -1,13 +1,11 @@
+
 var csp = require("../src/csp.js");
 
 var spawn  = csp.spawn
-  , send   = csp.send
-  , take   = csp.take
-  , select = csp.select
-  , sleep  = csp.sleep;
+  , Channel = csp.Channel;
 
 
-var chan = "I am a channel anyway.";
+var chan = new Channel();
 
 function* sequence_test() {
 	
@@ -16,7 +14,7 @@ function* sequence_test() {
 	var i = 0;
 	while (i < sequence.length) {
 
-		var input = yield take(chan);
+		var input = yield* chan.take();
 
 		if (input == sequence[i]) {
 			i++;
@@ -33,6 +31,6 @@ spawn( sequence_test() );
 
 process.openStdin().addListener("data", function(d) {
 
-	send(chan, parseInt(d));
+	chan.send(parseInt(d));
 
 });

@@ -2,9 +2,11 @@
 
 Bring golang-like CSP channel and coroutine to Javascript by using generator (ES6)
 
+It's implemented within 30 loc in Javascript.
+
 ## Requirements
 
-Need ES6 generators (nodejs >= 0.11.2)
+Need ES6 generators (nodejs >= 0.11.7)
 
 ## Run
 
@@ -14,39 +16,29 @@ Need ES6 generators (nodejs >= 0.11.2)
 
 In csp-js:
 
-* you don't need to create channel
-* channels are identified by number or string
 * channels have unlimited buffer
 * send item to channel will never be blocked 
 
 ## Example
 
 ```js
-// ping_pong example
+var ping = new Channel();
+var pong = new Channel();
 
-// get csp.js source file
-var csp = require("./src/csp.js");
-
-function* ping_pong(self, partner) {
-	var n = 1;
-	while (n > 0) {
-		n = yield csp.take(self);    // take item from "self" channel
-		
-		console.log(self, "get", n);
-		
-		csp.send(partner, n - 1);    // send item to "partner" channel
-	}
-	console.log(self, "done!!!");
+function* ping_pong(self, partner, name) {
+    var n = 1;
+    while(n > 0) {
+        n = yield* self.take();
+        console.log(name, "get", n);
+        partner.send(n-1);
+    }
+    console.log(name, "done!");
 }
 
-function* main() {
-	csp.spawn( ping_pong("ping", "pong") );
-	csp.spawn( ping_pong("pong", "ping") );
+spawn(ping_pong(ping, pong, "ping"))
+spawn(ping_pong(pong, ping, "pong"))
 
-	csp.send("ping", 6);
-}
-
-csp.spawn( main() ); // start main()
+ping.send(6)
 
 console.log("** all done! **");
 ```
@@ -68,7 +60,7 @@ console.log("** all done! **");
 
 #### spawn( generator_iterator_object )
 
-Create a new coroutine with generator_iterator_object. The coroutine will be destroyed when function calls "return".
+Create a new coroutine with generator_iterator_object. The coroutine will end when function calls "return".
 
 ```js
 function* gen(name) {
@@ -79,76 +71,65 @@ function* gen(name) {
 csp.spawn( gen("my name") ); // create a new coroutine
 ```
 	
-#### send( channel, item_to_send )
+#### Channel.send( obj_to_send )
 
-Send an item to the channel. This action will never be blocked.
+Send an object to the channel. This action will never be blocked.
 
 ```js
-// channel is identified by string or number
-var chan = "I am a channel";
+var chan = new Channel();
 
-csp.send(chan, "item to send");
+chan.send("item to send");
+chan.send([1, 2, 3, 4]);
+chan.send({ hi: "good" });
 ```
 
-#### yield take( channel )
+#### yield* Channel.take()
 
 Block until get an item from the channel.
 
 ```js
-csp.spawn(function* () {
+var chan = new Channel()
+
+spawn(function* () {
 	while (true) {
-		console.log(yield csp.take("channel"));
+		console.log(yield* chan.take());
 	}
 }());
 ```
 
-#### yield take( channel, max_time_to_wait )
-
-Wait to get an item from channel. If the coroutine cannot get item after max_time_to_wait, it will get a "null" instead.
-
-```js
-csp.spawn(function* () {
-	while (true) {
-		console.log(yield csp.take("channel", 1000));
-	}
-}());
-```
-
-#### yield select( list_of_channels )
-
-Block until a value is sent to one of channels in list_of_channels.
-
-```js
-csp.spawn(function* () {
-	while (true) {
-		console.log(yield csp.select([0, 1, "channel_2"]);
-	}
-}());
-```
-#### yield select( list_of_channels, max_time_to_wait )
-
-Block until a value is sent to one of channels in list_of_channels. If the coroutine cannot get item after max_time_to_wait, it will get a "null" instead.
-
-```js
-csp.spawn(function* () {
-	while (true) {
-		console.log(yield csp.select([0, 1, "channel_2"], 1000);
-	}
-}());
-```
-
-#### yield sleep( time_in_millisecond )
+#### yield* sleep( time_in_millisecond )
 
 The coroutine will sleep for a while (time_in_milliseconds).
 
 ```js
 function* i_am_lazy() {
 	while (true) {
-		yield csp.sleep(1000);
+		yield* sleep(1000);
 		console.log("ok");
 	}
 }
-csp.spawn( i_am_lazy() );
+spawn( i_am_lazy() );
+```
+
+#### yield* fs.readFile( filename )
+
+Call fs methods async (non-blocking, good performance) with sync style (easier to program).
+
+Not only fs, you can eliminate any callback function with this.
+
+```js
+spawn(function* () {
+
+	var f1 = yield* fs.readFile("xxx1.txt", "utf8");
+	var f2 = yield* fs.readFile("xxx2.txt", "utf8");
+
+	yield* fs.writeFile("xxx3.txt", "hello");
+
+	yield* fs.appendFile("xxx3.txt", ", world");
+	
+	var exists = yield* fs.exists("xxx.txt");
+
+}())
 ```
 
 ## Inspiration

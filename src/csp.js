@@ -1,233 +1,113 @@
 /* 
-	spawn(generator)
+    spawn(generator_iterator)
 
-	send(chan, object)
+    Channel.send(object)
 
-	yield take(chan)
-	yield take(chan, time_to_wait)
-	
-	yield select([chan_0, chan_1, chan_2])
-	yield select([chan_0, chan_1, chan_2], time_to_wait)
+    yield* Channel.take(object)
 
-	yield sleep(time_to_sleep)
+
+    // util functions API
+
+    yield* sleep(time_to_sleep)
+    
+    yield* fs.readFile(...)
+    yield* fs.writeFile(...)
+    yield* fs.appendFile(...)
+    yield* fs.exists(...)
 */
 
-var gens    = {}   // store generators and their status (timeout & watching)
-  , storage = {}   //
-  , waiting = {};  //
+// Goroutine and CSP Channel
 
-const TAKE        = 0;
-const TAKE_WAIT   = 1;
-const SELECT      = 2;
-const SELECT_WAIT = 3;
-const SLEEP       = 4;
+function handle(genIterator, result) {
 
-/*
- * @handle_request: recursively handle request
- * may use loop for better performance later ...
- *
- * @gid:    generator's id
- * @result: yielded result from generator
- *			@result: { value: request, done: bool }
- *				@value: yielded or returned item
- *				@done:  false if generator "yield" 
- *				@done:  true  if generator "return"
- */
-function handle_request(gid, result) {
+    while (!result.done) {
+        var chan = result.value;
 
-	if (result.done) {
-		delete gens[gid];
-		return;
-	}
-
-	var request = result.value;
-
-	switch (request.type) {
-	
-	case TAKE:
-	case TAKE_WAIT:
-	
-		var chan = request.channel;
-
-		if (storage[chan] != null && storage[chan].length > 0) {
-			// ok to take
-			handle_request(gid, gens[gid].gen.send(storage[chan].shift()));
-			return;
-		}
-
-		// not ready
-		if (waiting[chan] == null) {
-			waiting[chan] = [];
-		}
-		waiting[chan].push(gid);
-
-		gens[gid].status = request.type;
-
-		if (request.type == TAKE_WAIT) {
-
-			// need to wait
-			gens[gid].timeout = setTimeout(function () {
-
-				// clear watching item
-				waiting[chan].splice(waiting[chan].indexOf(gid), 1);
-
-				// wake up
-				handle_request(gid, gens[gid].gen.next());
-
-			}, request.time);
-		}
-		
-		return;
-
-	case SELECT:
-	case SELECT_WAIT:
-
-		var chans = request.channels;
-
-		// check all channels
-		for (var i = 0; i < chans.length; i++) {
-			if (storage[chans[i]] != null && storage[chans[i]].length > 0) {
-				handle_request(gid, gens[gid].gen.send(storage[chans[i]].shift()));
-				return; // exit if found
-			}
-		};
-
-		if (gens[gid].watching == null) {
-			gens[gid].watching = [];
-		}
-
-		// set watcher
-		for (var i = 0; i < chans.length; i++) {
-
-			if (waiting[chans[i]] == null) {
-				waiting[chans[i]] = [];
-			}
-			waiting[chans[i]].push(gid);
-
-			// add channel to watching list
-			gens[gid].watching.push(chans[i]);
-		}
-
-		gens[gid].status = request.type;
-
-		if (request.type == SELECT_WAIT) {
-		
-			gens[gid].timeout = setTimeout(function () {
-				
-				// clear watching list
-				for (var i = 0; i < gens[gid].watching.length; i++) {
-					waiting[gens[gid].watching[i]].splice(waiting[gens[gid].watching[i]].indexOf(gid), 1);
-				}
-
-				// delete watching list
-				delete gens[gid].watching;
-
-				handle_request(gid, gens[gid].gen.next());
-			
-			}, request.time);
-		}
-		return;
-
-	case SLEEP:
-
-		setTimeout(function () {
-			handle_request(gid, gens[gid].gen.next());
-		}, request.time);
-		return;
-
-	default:
-		throw new Error("Invalid request.");
-	}
-
+        if (chan.storage.length <= 0) {
+            chan.waiting.push(genIterator);
+            break;
+        }
+        result = genIterator.next(chan.storage.shift());
+    }
 }
 
-var gid_counter = 0; // used to generate unique generator id
+function spawn(genIterator) { handle(genIterator, genIterator.next()); }
 
-/*
- * spawn() is used to create new active generator
- */
-function spawn(generator) {
-
-	var gid = gid_counter++;
-
-	gens[gid] = { gen: generator }
-
-	// run immediately and handle yielded result
-	handle_request(gid, gens[gid].gen.next());
-
+function Channel() {
+    this.storage = [];
+    this.waiting = [];
 }
 
-/*
- * send() is the trigger to active the idle generators
- */
-function send(name, item) {
-
-	if (waiting[name] == null || waiting[name].length == 0) {
-
-		// no one is waiting
-		if (storage[name] == null) {
-			storage[name] = [];
-		}
-		storage[name].push(item);		
-		return;
-	}
-
-	// some one is waiting
-	var gid = waiting[name].shift();
-
-	switch (gens[gid].status) {
-
-	case TAKE_WAIT:
-		
-		// clear setTimeout
-		clearTimeout(gens[gid].timeout);
-		break;
-
-	case SELECT_WAIT:
-		
-		// clear setTimeout
-		clearTimeout(gens[gid].timeout);
-
-		// don't break, continue to clear watching list
-	case SELECT:
-		if (gens[gid].watching == null) break;
-
-		// clear watching list
-		for (var i = 0; i < gens[gid].watching.length; i++) {
-			waiting[gens[gid].watching[i]].splice(waiting[gens[gid].watching[i]].indexOf(gid), 1);
-		}
-		// delete watching list
-		delete gens[gid].watching;
-	}
-
-	handle_request(gid, gens[gid].gen.send(item));
-
+Channel.prototype.send = function (obj) {
+    this.storage.push(obj);
+    
+    if (this.waiting.length > 0) {
+        handle(this.waiting.shift(), { value: this, done: false });
+    }
 }
 
-function take(channel, time) {
-	if (time == null)
-		return { type: TAKE, channel: channel};
-	else
-		return { type: TAKE_WAIT, channel: channel, time: time }
+Channel.prototype.take = function* () {
+
+    return this.storage.length > 0 ? this.storage.shift() : yield this;
 }
 
-function select(channels, time) {
-	if (time == null)
-		return { type: SELECT, channels: channels };
-	else
-		return { type: SELECT_WAIT, channels: channels, time: time };
+
+
+// Util functions based on CSP
+
+function* sleep(timeout) {
+    var ch = new Channel();
+    
+    setTimeout(function () {
+        ch.send(null);
+    }, timeout);
+    
+    return yield* ch.take();
 }
 
-function sleep(time) {
-	return { type: SLEEP, time: time };
+
+var fs = {
+    readFile: function* (filename, options) {
+        var ch = new Channel();
+        require("fs").readFile(filename, options, function (err, data) {
+            if (err) throw err;
+            ch.send(data);
+        });
+        return yield* ch.take();
+    },
+
+    writeFile: function* (filename, data, options) {
+        var ch = new Channel();
+        require("fs").writeFile(filename, data, options, function (err) {
+            if (err) throw err;
+            ch.send(null);
+        })
+        return yield* ch.take();
+    },
+    
+    appendFile: function* (filename, data, options) {
+        var ch = new Channel();
+        require("fs").appendFile(filename, data, options, function (err) {
+            if (err) throw err;
+            ch.send(null);
+        })
+        return yield* ch.take();
+    },
+    
+    exists: function* (path) {
+        var ch = new Channel();
+        require("fs").exists(path, function (exists) {
+            ch.send(exists);
+        })
+        return yield* ch.take();
+    }
 }
 
 
 module.exports = {
-	spawn:  spawn,
-	send:   send,
-	take:   take,
-	select: select,
-	sleep:  sleep
-};
+    fs:      fs,
+    sleep:   sleep,
+    spawn:   spawn,
+    Channel: Channel
+}
 
