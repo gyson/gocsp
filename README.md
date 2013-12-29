@@ -2,11 +2,13 @@
 
 Bring golang-like CSP channel and coroutine to Javascript by using generator (ES6)
 
-It's implemented within 30 loc in Javascript.
-
 ## Requirements
 
 Need ES6 generators (nodejs >= 0.11.7)
+
+## Install
+
+	$ npm install rejs.csp
 
 ## Run
 
