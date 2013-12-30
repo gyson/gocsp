@@ -8,7 +8,7 @@ Need ES6 generators (nodejs >= 0.11.7)
 
 ## Install
 
-	$ npm install rejs.csp
+	$ npm install rejs-csp
 
 ## Run
 
