@@ -24,7 +24,7 @@ spawn(function* () {
 
 	yield chan;
 
-}())
+})
 
 spawn(function* () {
 
