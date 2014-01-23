@@ -30,7 +30,7 @@ var pong = new Channel();
 function* ping_pong(self, partner, name) {
     var n = 1;
     while(n > 0) {
-        n = yield* self.take();
+        n = yield self;
         console.log(name, "get", n);
         partner.send(n-1);
     }
@@ -60,9 +60,9 @@ console.log("** all done! **");
 
 ## Documentation
 
-#### spawn( generator_iterator_object )
+#### spawn(generator)
 
-Create a new coroutine with generator_iterator_object. The coroutine will end when function calls "return".
+Create a new coroutine with generator object. The coroutine will end when function calls "return".
 
 ```js
 function* gen(name) {
@@ -73,7 +73,7 @@ function* gen(name) {
 spawn( gen("my name") ); // create a new coroutine
 ```
 	
-#### Channel.send( obj_to_send )
+#### Channel.send( object )
 
 Send an object to the channel. This action will never be blocked.
 
@@ -85,7 +85,7 @@ chan.send([1, 2, 3, 4]);
 chan.send({ hi: "good" });
 ```
 
-#### yield* Channel.take()
+#### yield channel
 
 Block until get an item from the channel.
 
@@ -94,12 +94,12 @@ var chan = new Channel()
 
 spawn(function* () {
 	while (true) {
-		console.log(yield* chan.take());
+		console.log(yield chan);
 	}
 }());
 ```
 
-#### yield* sleep( time_in_millisecond )
+#### yield* sleep(time)
 
 The coroutine will sleep for a while (time_in_milliseconds).
 
@@ -113,25 +113,25 @@ function* i_am_lazy() {
 spawn( i_am_lazy() );
 ```
 
-#### yield* fs.readFile( filename )
-
-Call fs methods async (non-blocking, good performance) with sync style (easier to program).
-
-Not only fs, you can eliminate any callback function with this.
+#### yield* wait(time, generator)
 
 ```js
-spawn(function* () {
 
-	var f1 = yield* fs.readFile("xxx1.txt", "utf8");
-	var f2 = yield* fs.readFile("xxx2.txt", "utf8");
+	var result = yield* wait(1000, sleep(2000));
 
-	yield* fs.writeFile("xxx3.txt", "hello");
+	assert(result.timeout === true);
+```
 
-	yield* fs.appendFile("xxx3.txt", ", world");
-	
-	var exists = yield* fs.exists("xxx.txt");
+#### yield* parallel(generators)
 
-}())
+```js
+	var fs = require("rejs-fs");
+
+	var files = yield* parallel([
+		fs.readFile("path/to/file", "utf-8"),
+		fs.readFile("path/to/file", "utf-8"),
+		fs.readFile("path/to/file", "utf-8"),		
+	]);
 ```
 
 ## Inspiration

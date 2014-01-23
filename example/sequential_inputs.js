@@ -1,6 +1,6 @@
 
-var spawn   = require("../src/csp.js").spawn
-var Channel = require("../src/csp.js").Channel;
+var spawn   = require("../lib/csp.js").spawn
+var Channel = require("../lib/csp.js").Channel;
 
 
 var chan = new Channel();
@@ -12,7 +12,7 @@ function* sequence_test() {
     var i = 0;
     while (i < sequence.length) {
 
-        var input = yield* chan.take();
+        var input = yield chan;
 
         if (input == sequence[i]) {
             i++;

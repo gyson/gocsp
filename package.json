@@ -1,8 +1,8 @@
 {
   "name": "rejs-csp",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "CSP channel and coroutine in Javascript",
-  "main": "index.js",
+  "main": "./lib/csp.js",
   "directories": {
     "example": "examples"
   },
