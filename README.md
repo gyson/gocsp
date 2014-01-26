@@ -12,7 +12,7 @@ Need ES6 generators (nodejs >= 0.11.7)
 
 ## Run
 
-	$ node -harmony <file>.js
+	$ node --harmony <file>.js
 
 ## Difference between csp-js and golang
 
