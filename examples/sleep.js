@@ -6,7 +6,7 @@ var spawn = require("../lib/csp.js").spawn;
 
 function* go_sleep(name) {
     for (var i = 0; i < 20; i++) {
-        yield* sleep(1000);
+        yield sleep(1000);
         console.log(name + ": " + i);
     }
 }
