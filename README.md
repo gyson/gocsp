@@ -8,11 +8,11 @@ Need ES6 generators (nodejs >= 0.11.7)
 
 ## Install
 
-	$ npm install rejs-csp
+    $ npm install rejs-csp
 
 ## Run
 
-	$ node --harmony <file>.js
+    $ node --harmony <file>.js
 
 ## Difference between csp-js and golang
 
@@ -24,6 +24,9 @@ In csp-js:
 ## Example
 
 ```js
+var spawn   = require("gocsp").spawn;
+var Channel = require("gocsp").Channel;
+
 var ping = new Channel();
 var pong = new Channel();
 
@@ -45,18 +48,18 @@ ping.send(6)
 console.log("** all done! **");
 ```
 
-	$ node -harmony ping-pong.js
-	ping get 6
-	pong get 5
-	ping get 4
-	pong get 3
-	ping get 2
-	pong get 1
-	ping get 0
-	pong get -1
-	pong done!!!
-	ping done!!!
-	** all done **
+    $ node -harmony ping-pong.js
+    ping get 6
+    pong get 5
+    ping get 4
+    pong get 3
+    ping get 2
+    pong get 1
+    ping get 0
+    pong get -1
+    pong done!!!
+    ping done!!!
+    ** all done **
 
 ## Documentation
 
@@ -66,14 +69,14 @@ Create a new coroutine with generator object. The coroutine will end when functi
 
 ```js
 function* gen(name) {
-	console.log(name, " is inside generator!");
+    console.log(name, " is inside generator!");
 
-	if (name == "my name") return; // use "return" to quit the generator
+    if (name == "my name") return; // use "return" to quit the generator
 }
 spawn( gen("my name") ); // create a new coroutine
 ```
-	
-#### Channel.send( object )
+    
+#### Channel.send(object)
 
 Send an object to the channel. This action will never be blocked.
 
@@ -93,45 +96,58 @@ Block until get an item from the channel.
 var chan = new Channel()
 
 spawn(function* () {
-	while (true) {
-		console.log(yield chan);
-	}
+    while (true) {
+        console.log(yield chan);
+    }
 }());
 ```
 
-#### yield* sleep(time)
+#### yield wait(time, channel)
+
+```js
+spawn(function* () {
+    var [item, timeout] = yield wait(1000, sleep(2000));
+});
+```
+
+#### yield sleep(time)
 
 The coroutine will sleep for a while (time_in_milliseconds).
 
 ```js
-function* i_am_lazy() {
-	while (true) {
-		yield* sleep(1000);
-		console.log("ok");
-	}
-}
-spawn( i_am_lazy() );
+spawn(function* () {
+    while (true) {
+        yield sleep(1000);
+        console.log("ok");
+    }
+});
 ```
 
-#### yield* wait(time, generator)
+#### select
+
+Select item from multiple channels
 
 ```js
-
-	var result = yield* wait(1000, sleep(2000));
-
-	assert(result.timeout === true);
+spawn(function* () {
+    var [item, index] = select({
+        "channel 1": channel_1,
+        "channel 2": channel_2
+    })
+});
 ```
 
-#### yield* parallel(generators)
+#### parallel
+
+Wait results from multiple channels
 
 ```js
-	var fs = require("rejs-fs");
+    var fs = require("gocsp-fs");
 
-	var files = yield* parallel([
-		fs.readFile("path/to/file", "utf-8"),
-		fs.readFile("path/to/file", "utf-8"),
-		fs.readFile("path/to/file", "utf-8"),		
-	]);
+    var files = yield parallel(
+        fs.readFile("path/to/file0", "utf-8"),
+        fs.readFile("path/to/file1", "utf-8"),
+        fs.readFile("path/to/file2", "utf-8")        
+    );
 ```
 
 ## Inspiration

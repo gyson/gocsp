@@ -1,6 +1,6 @@
 {
-  "name": "rejs-csp",
-  "version": "0.0.2",
+  "name": "gocsp",
+  "version": "0.0.1",
   "description": "CSP channel and coroutine in Javascript",
   "main": "./lib/csp.js",
   "directories": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "http://github.com/gyson/rejs-csp.git"
+    "url": "http://github.com/gyson/gocsp.git"
   },
   "keywords": [
     "csp",
@@ -17,6 +17,6 @@
   ],
   "author": "Yunsong Guo",
   "license": "MIT",
-  "bugs": { "url": "https://github.com/gyson/rejs-csp/issues" },
+  "bugs": { "url": "https://github.com/gyson/gocsp/issues" },
   "engines": { "node": ">= 0.11.7" }
 }
