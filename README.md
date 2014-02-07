@@ -21,124 +21,111 @@ In csp-js:
 * channels have unlimited buffer
 * send item to channel will never be blocked 
 
-## Example
+## API
+
+### spawn(Generator or GeneratorFunction)
+
+Create a new coroutine with generator object or generator function. The coroutine will end when function calls "return".
 
 ```js
-var spawn   = require("gocsp").spawn;
-var Channel = require("gocsp").Channel;
-
-var ping = new Channel();
-var pong = new Channel();
-
-function* ping_pong(self, partner, name) {
-    var n = 1;
-    while(n > 0) {
-        n = yield self;
-        console.log(name, "get", n);
-        partner.send(n-1);
-    }
-    console.log(name, "done!");
-}
-
-spawn(ping_pong(ping, pong, "ping"))
-spawn(ping_pong(pong, ping, "pong"))
-
-ping.send(6)
-
-console.log("** all done! **");
-```
-
-    $ node -harmony ping-pong.js
-    ping get 6
-    pong get 5
-    ping get 4
-    pong get 3
-    ping get 2
-    pong get 1
-    ping get 0
-    pong get -1
-    pong done!!!
-    ping done!!!
-    ** all done **
-
-## Documentation
-
-#### spawn(generator)
-
-Create a new coroutine with generator object. The coroutine will end when function calls "return".
-
-```js
-function* gen(name) {
-    console.log(name, " is inside generator!");
-
-    if (name == "my name") return; // use "return" to quit the generator
-}
-spawn( gen("my name") ); // create a new coroutine
+    // spawn with a GeneratorFunction
+    spawn(function* () {
+        console.log("Hello, world.");
+    });
+    
+    function* hi(name) { console.log("Hello, " + name); }
+    // spawn with a generator
+    spawn( hi("my name") );
 ```
     
-#### Channel.send(object)
+### Channel.send(object)
 
 Send an object to the channel. This action will never be blocked.
 
 ```js
-var chan = new Channel();
+    var chan = new Channel();
 
-chan.send("item to send");
-chan.send([1, 2, 3, 4]);
-chan.send({ hi: "good" });
+    chan.send("item to send");
+    chan.send([1, 2, 3, 4]);
+    chan.send({ hi: "good" });
 ```
 
-#### yield channel
+### yield channel
 
 Block until get an item from the channel.
 
 ```js
-var chan = new Channel()
+    var chan = new Channel()
 
-spawn(function* () {
-    while (true) {
+    // send "hello" to channel
+    chan.send("hello")
+
+    spawn(function* () {
+        // "hello" will be printed
         console.log(yield chan);
-    }
-}());
+    });
 ```
 
-#### yield wait(time, channel)
+### wait(time, channel)
+
+Wait a channel for a mount of time, return an array of two element. First element is the item taken from channel (null or undefined if timeout). Second element is boolean value indicate timeout or not (true for timeout, false for on time).
 
 ```js
-spawn(function* () {
-    var [item, timeout] = yield wait(1000, sleep(2000));
-});
+    spawn(function* () {
+        // if with ES6 destructuring assignment, it would like this:
+        var [item, timeout] = yield wait(1000, channel);
+        
+        // you can combine it with other util functions:
+        var [files, timeout] = yield wait(1000, parallel(
+            fs.readFile("path/to/file1", "utf8")
+            fs.readFile("path/to/file2", "utf8")
+            fs.readFile("path/to/file2", "utf8")
+        ));        
+    });
 ```
 
-#### yield sleep(time)
+### sleep(time)
 
-The coroutine will sleep for a while (time_in_milliseconds).
+The current coroutine will sleep for a while (time_in_milliseconds).
 
 ```js
-spawn(function* () {
-    while (true) {
-        yield sleep(1000);
-        console.log("ok");
-    }
-});
+    spawn(function* () {
+        console.log("Before sleep.");
+        
+        yield sleep(1000); // sleep for a second
+        
+        console.log("ok, I am back now");
+    });
 ```
 
-#### select
+### select([channels array] or { channels map })
 
 Select item from multiple channels
 
 ```js
-spawn(function* () {
-    var [item, index] = select({
-        "channel 1": channel_1,
-        "channel 2": channel_2
-    })
-});
+    var chan1 = new Channel();
+    var chan2 = new Channel();
+    
+    chan2.send("I am chan2");
+    
+    spawn(function* () {
+    
+        // again, with ES6 destructuring
+        var [item, index] = select({
+            "channel 1": chan1,
+            "channel 2": chan1
+        });
+        
+        // will get item from chan2
+        assert(item === "I am chan2");
+        assert(index === "channel 2");
+        
+    });
 ```
 
-#### parallel
+### parallel(chan0, chan1, ...)
 
-Wait results from multiple channels
+Wait results from multiple channels, return an array of items taken from each channels in order.
 
 ```js
     var fs = require("gocsp-fs");
@@ -148,6 +135,9 @@ Wait results from multiple channels
         fs.readFile("path/to/file1", "utf-8"),
         fs.readFile("path/to/file2", "utf-8")        
     );
+    
+    // parallel for an array of channels
+    yield parallel.apply(null, [chan0, chan1, chan2])
 ```
 
 ## Inspiration
