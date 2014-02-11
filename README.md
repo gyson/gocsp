@@ -19,7 +19,7 @@ Need ES6 generators (nodejs >= 0.11.7)
 In csp-js:
 
 * channels have unlimited buffer
-* send item to channel will never be blocked 
+* put item to channel will never be blocked
 
 ## API
 
@@ -38,27 +38,27 @@ Create a new coroutine with generator object or generator function. The coroutin
     spawn( hi("my name") );
 ```
     
-### Channel.send(object)
+### Channel.put(object)
 
 Send an object to the channel. This action will never be blocked.
 
 ```js
     var chan = new Channel();
 
-    chan.send("item to send");
-    chan.send([1, 2, 3, 4]);
-    chan.send({ hi: "good" });
+    chan.put("item to put");
+    chan.put([1, 2, 3, 4]);
+    chan.put({ hi: "good" });
 ```
 
 ### yield channel
 
 Block until get an item from the channel.
 
-```js
+```js 
     var chan = new Channel()
 
-    // send "hello" to channel
-    chan.send("hello")
+    // put "hello" to channel
+    chan.put("hello")
 
     spawn(function* () {
         // "hello" will be printed
@@ -106,7 +106,7 @@ Select item from multiple channels
     var chan1 = new Channel();
     var chan2 = new Channel();
     
-    chan2.send("I am chan2");
+    chan2.put("I am chan2");
     
     spawn(function* () {
     
@@ -123,18 +123,18 @@ Select item from multiple channels
     });
 ```
 
-### parallel(chan0, chan1, ...)
+### parallel([chan0, chan1, ...])
 
 Wait results from multiple channels, return an array of items taken from each channels in order.
 
 ```js
     var fs = require("gocsp-fs");
 
-    var files = yield parallel(
+    var files = yield parallel([
         fs.readFile("path/to/file0", "utf-8"),
         fs.readFile("path/to/file1", "utf-8"),
         fs.readFile("path/to/file2", "utf-8")        
-    );
+    ]);
     
     // parallel for an array of channels
     yield parallel.apply(null, [chan0, chan1, chan2])

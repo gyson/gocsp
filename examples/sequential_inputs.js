@@ -29,7 +29,7 @@ spawn( sequence_test() );
 
 process.openStdin().addListener("data", function(d) {
 
-    chan.send(parseInt(d));
+    chan.put(parseInt(d));
 
 });
 

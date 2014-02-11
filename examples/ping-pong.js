@@ -9,7 +9,7 @@ function* ping_pong(self, partner, name) {
     do {
         var n = yield self;
         console.log(name, "get", n);
-        partner.send(n-1);
+        partner.put(n-1);
     } while (n > 0);
     console.log(name, "done!");
 }
@@ -17,7 +17,7 @@ function* ping_pong(self, partner, name) {
 spawn( ping_pong(ping, pong, "ping") );
 spawn( ping_pong(pong, ping, "pong") );
 
-ping.send(10);
+ping.put(10);
 
 console.log("** all done **");
 
