@@ -1,11 +1,9 @@
 
-var spawn   = require("../lib/csp.js").spawn
-var Channel = require("../lib/csp.js").Channel;
+var go = require("../lib/csp.js");
 
+var chan = new go.Channel();
 
-var chan = new Channel();
-
-function* sequence_test() {
+go(function* () {
     
     var sequence = [3, 1, 4, 6, 8];
     
@@ -23,9 +21,7 @@ function* sequence_test() {
 
     }
     console.log("done!!!");
-}
-
-spawn( sequence_test() );
+});
 
 process.openStdin().addListener("data", function(d) {
 

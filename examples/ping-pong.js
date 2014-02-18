@@ -1,11 +1,10 @@
 
-var spawn   = require("../lib/csp.js").spawn;
-var Channel = require("../lib/csp.js").Channel;
+var go = require("../lib/csp.js");
 
-var ping = new Channel();
-var pong = new Channel();
+var ping = new go.Channel();
+var pong = new go.Channel();
 
-function* ping_pong(self, partner, name) {
+function* ping_pong (self, partner, name) {
     do {
         var n = yield self;
         console.log(name, "get", n);
@@ -14,12 +13,10 @@ function* ping_pong(self, partner, name) {
     console.log(name, "done!");
 }
 
-spawn( ping_pong(ping, pong, "ping") );
-spawn( ping_pong(pong, ping, "pong") );
+go( ping_pong(ping, pong, "ping") );
+go( ping_pong(pong, ping, "pong") );
 
 ping.put(10);
 
 console.log("** all done **");
-
-
 

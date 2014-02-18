@@ -1,17 +1,14 @@
 
-var sleep = require("../lib/csp.js").sleep;
-var spawn = require("../lib/csp.js").spawn;
-
-
+var go = require("../lib/csp.js");
 
 function* go_sleep(name) {
     for (var i = 0; i < 20; i++) {
-        yield sleep(1000);
+        yield go.sleep(1000);
         console.log(name + ": " + i);
     }
 }
 
-spawn( go_sleep("A") )
+go( go_sleep("A") )
 
-spawn( go_sleep("B") )
+go( go_sleep("B") )
 
