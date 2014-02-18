@@ -1,5 +1,5 @@
 
-var go = require("../lib/csp.js");
+var go = require("../lib/gocsp.js");
 
 var chan = new go.Channel();
 

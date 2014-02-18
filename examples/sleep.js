@@ -1,5 +1,5 @@
 
-var go = require("../lib/csp.js");
+var go = require("../lib/gocsp.js");
 
 function* go_sleep(name) {
     for (var i = 0; i < 20; i++) {

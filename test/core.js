@@ -1,20 +1,17 @@
 
 var assert = require("assert");
 
-var csp = require("../lib/csp.js");
+var go = require("../lib/gocsp.js");
 
-var spawn   = csp.spawn;
-var Channel = csp.Channel;
-
-var chan = new Channel();
+var chan = new go.Channel();
 
 var shared = "shared 0";
 
-spawn(function* () {
+go(function* () {
 
 	var item = "item 0";
 
-	chan.send(item);
+	chan.put(item);
 
 	assert(chan.length == 1);
 
@@ -24,13 +21,13 @@ spawn(function* () {
 
 	yield chan;
 
-})
+});
 
-spawn(function* () {
+go(function* () {
 
-	chan.send(shared);
+	chan.put(shared);
 
 	console.log(chan.length);
 
-}())
+});
 
