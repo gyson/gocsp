@@ -2,7 +2,7 @@
   "name": "gocsp",
   "version": "0.0.1",
   "description": "CSP channel and coroutine in Javascript",
-  "main": "./lib/csp.js",
+  "main": "./lib/gocsp.js",
   "directories": {
     "example": "examples"
   },
