@@ -1,6 +1,6 @@
 {
   "name": "gocsp",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "CSP channel and coroutine in Javascript",
   "main": "./index.js",
   "bin": {
