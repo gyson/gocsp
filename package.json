@@ -3,12 +3,6 @@
   "version": "0.0.3",
   "description": "CSP channel and coroutine in Javascript",
   "main": "./index.js",
-  "bin": {
-    "gocsp": "lib/cli.js"
-  },
-  "directories": {
-    "example": "examples"
-  },
   "repository": {
     "type": "git",
     "url": "http://github.com/gyson/gocsp.git"
@@ -20,6 +14,10 @@
   ],
   "author": "Yunsong Guo",
   "license": "MIT",
-  "bugs": { "url": "https://github.com/gyson/gocsp/issues" },
-  "engines": { "node": ">= 0.11.11" }
+  "bugs": {
+    "url": "https://github.com/gyson/gocsp/issues"
+  },
+  "engines": {
+    "node": ">= 0.11.13"
+  }
 }

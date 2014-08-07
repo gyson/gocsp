@@ -1,8 +1,7 @@
 
-require("./lib/go.js");
-require("./lib/util.js");
-require("./lib/module.js");
-require("./lib/web.js");
 
-// go is global variable now.
+var go = require('./lib/go');
+
+go.Channel = require('./lib/channel');
+
 module.exports = go;
