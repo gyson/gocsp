@@ -1,6 +1,6 @@
 {
   "name": "gocsp",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "CSP channel and coroutine in Javascript",
   "main": "./index.js",
   "repository": {
@@ -24,5 +24,8 @@
     "benchmark": "^1.0.0",
     "bluebird": "^2.3.2",
     "mocha": "^1.21.4"
+  },
+  "dependencies": {
+    "transy": "0.0.4"
   }
 }
