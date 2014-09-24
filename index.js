@@ -1,4 +1,4 @@
 
 'use strict';
 
-module.exports = require('./lib/go');
+module.exports = require('./lib/index');
