@@ -16,48 +16,7 @@ Need ES6 generators (nodejs >= 0.11.13)
 
 ## API
 
-### go(Generator or GeneratorFunction)
-
-Create a new coroutine with generator object or generator function. The coroutine will end when function calls "return".
-
-```js
-// spawn with a GeneratorFunction
-go(function* () {
-    console.log("Hello, world.");
-})();
-
-var hi = go(function* hi(name) { console.log("Hello, " + name); })
-// spawn with a generator
-hi("my name");
-```
-
-### go.Channel
-
-```js
-var chan = new go.Channel();
-
-go(function* () {
-    console.log(yield chan); // print "xxx"
-    console.log(yield chan); // print "yyy"
-});
-
-chan.put("xxx");
-chan.put("yyy");
-```
-
-### go.sleep(time)
-
-The current coroutine will sleep for a while (time_in_milliseconds).
-
-```js
-go(function* () {
-    console.log("Before sleep.");
-
-    yield go.sleep(1000); // sleep for a second
-
-    console.log("ok, I am back now");
-})();
-```
+coming soon
 
 ## Inspiration
 

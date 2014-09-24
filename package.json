@@ -23,8 +23,6 @@
   "devDependencies": {
     "benchmark": "^1.0.0",
     "bluebird": "^2.3.2",
-    "genny": "^0.5.5",
-    "q": "^1.0.1",
-    "suspend": "^0.6.0"
+    "mocha": "^1.21.4"
   }
 }
