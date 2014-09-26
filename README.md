@@ -14,6 +14,20 @@ Need ES6 generators + native Promise (nodejs >= 0.11.13)
 
     $ node --harmony <file>.js
 
+## Example
+
+```js
+var go = require('gocsp');
+
+var chan = new go.Channel()
+
+chan.put('hi')
+
+go.spawn(function* () {
+    assert((yield go('take', chan)).value === 'hi')
+})
+```
+
 ## Error Handling && Stack Trace
 
 ## API
