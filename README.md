@@ -4,7 +4,7 @@ Bring golang-like CSP channel and coroutine to Javascript by using generator (ES
 
 ## Requirements
 
-Need ES6 generators (nodejs >= 0.11.13)
+Need ES6 generators + native Promise (nodejs >= 0.11.13)
 
 ## Install
 
@@ -14,11 +14,15 @@ Need ES6 generators (nodejs >= 0.11.13)
 
     $ node --harmony <file>.js
 
+## Error Handling && Stack Trace
+
 ## API
 
 coming soon
 
-## Inspiration
+## Resource
+
+* other CSP implementation
 
 * https://github.com/Gozala/channel
 * https://github.com/visionmedia/co

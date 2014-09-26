@@ -1,18 +1,16 @@
 
 var go = require('../lib/index')
-var Channel = require('../lib/channel')
+var stream = require('stream')
+var Readable = stream.Readable
 
-var ch = new Channel()
+var chan = go.Channel.chain(function () {this
 
-ch.each(console.log).done(function () {
-    console.log('done!')
+    .map(function (x) { return x.toString() })
+    .map(function (x) { return 'reply: ' + x })
+
 })
 
-ch.put('hello')
-ch.put('world')
-ch.put('I am Yunsong').then(function () {
-    ch.input.close()
-})
 
-// BUG HERE!
-// ch.input.close()
+process.stdin
+    .pipe(chan)
+    .pipe(process.stdout);
