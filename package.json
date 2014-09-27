@@ -26,6 +26,7 @@
     "mocha": "^1.21.4"
   },
   "dependencies": {
-    "transy": "0.0.4"
+    "transy": "0.0.4",
+    "ws": "^0.4.32"
   }
 }
