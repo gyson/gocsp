@@ -36,8 +36,6 @@ coming soon
 
 ## Resource
 
-* other CSP implementation
-
 * https://github.com/Gozala/channel
 * https://github.com/visionmedia/co
 * https://github.com/olahol/node-csp
