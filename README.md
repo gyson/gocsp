@@ -4,7 +4,7 @@ Bring golang-like CSP channel and coroutine to Javascript by using generator (ES
 
 ## Requirements
 
-Need ES6 generators + native Promise (nodejs >= 0.11.13)
+Need ES6 (nodejs >= 0.11.13)
 
 ## Install
 
@@ -17,22 +17,17 @@ Need ES6 generators + native Promise (nodejs >= 0.11.13)
 ## Example
 
 ```js
-var go = require('gocsp');
+var fs = require('fs')
+var go = require('gocsp')
 
-var chan = new go.Channel()
+go(function* () {
 
-chan.put('hi')
+    var file = yield cb => fs.readFile(__filename, 'utf8', cb)
 
-go.spawn(function* () {
-    assert((yield go('take', chan)).value === 'hi')
-})
+    console.log(file)
+
+})()
 ```
-
-## Error Handling && Stack Trace
-
-## API
-
-coming soon
 
 ## Resource
 
