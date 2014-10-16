@@ -11,8 +11,6 @@ describe('linklist', function () {
         list.push(20);
         list.push(30);
 
-        assert(list.length === 3)
-
         assert(list.shift() === 10);
         assert(list.shift() === 20);
         assert(list.shift() === 30);
@@ -28,11 +26,7 @@ describe('linklist', function () {
         var toCancel = list.push(3);
         list.push(4);
 
-        assert(list.length === 4)
-
         LinkList.remove(toCancel);
-
-        assert(list.length === 3)
 
         assert(list.shift() === 1);
         assert(list.shift() === 2);

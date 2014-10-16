@@ -1,3 +1,4 @@
 
-var assert = require('assert');
-var Coroutine = require('../lib/coroutine');
+var go = require('gocsp')
+var util = require('util')
+var assert = require('assert')

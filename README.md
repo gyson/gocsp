@@ -22,6 +22,10 @@ var go = require('gocsp')
 
 go(function* () {
 
+    // sleep for 1 second
+    yield (res, rej) => setTimeout(res, 1000)
+
+    // read file
     var file = yield cb => fs.readFile(__filename, 'utf8', cb)
 
     console.log(file)

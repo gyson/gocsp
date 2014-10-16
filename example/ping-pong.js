@@ -1,17 +1,17 @@
 
-var go = require("..");
-var ping = new go.Channel();
-var pong = new go.Channel();
+var go = require('gocsp');
+var ping = new go.Port();
+var pong = new go.Port();
 
-var ping_pong = go.async(function* ping_pong (self, partner, name) {
+var ping_pong = go(function* ping_pong (self, partner, name) {
     do {
-        var n = (yield go('take', self)).value;
+        var n = (yield go.take(self)).value
 
-        console.log(name, "get", n);
+        console.log(name, "get", n)
 
-        partner.put(n-1);
+        partner.put(n-1)
 
-    } while (n > 1);
+    } while (n > 1)
 
     console.log(name, "done!");
 })
