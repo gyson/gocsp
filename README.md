@@ -20,16 +20,33 @@ Need ES6 (nodejs >= 0.11.13)
 var fs = require('fs')
 var go = require('gocsp')
 
-go(function* () {
+var chan1 = new go.Channel()
+var chan2 = new go.Channel()
 
+go(function* () {
     // sleep for 1 second
-    yield (res, rej) => setTimeout(res, 1000)
+    yield go.sleep(1000)
 
     // read file
     var file = yield cb => fs.readFile(__filename, 'utf8', cb)
 
-    console.log(file)
+    // take an item from Channel
+    yield go.take(chan1)
 
+    // put an item to Channel
+    yield go.put(chan2, 'something')
+
+    // select from multiple channel / events
+    // just like golang's select statement
+    yield go.select(s => s
+        .take(chan1, function (val) {
+            // ...
+        })
+        .put(chan2, 'value', function (result) {
+            // ...
+        })
+        .timeout(1000)
+    )
 })()
 ```
 
