@@ -1,24 +1,20 @@
 
-var LinkList = require('../lib/linklist');
-var Benchmark = require('benchmark');
+var LinkList = require('../lib/linklist')
+var Benchmark = require('benchmark')
 
-var k = 10;
+var k = 3
 
 function test(l) {
-    var x = 1;
+    var x = 1
     for (var i = 0; i < k; i++) {
         l.push(function () {
-            return x++;
-        });
-        l.push(function () {
-            return x--;
-        });
+            return x++
+        })
     }
     for (var i = 0; i < k; i++) {
-        l.shift()();
-        l.shift()();
+        l.shift()()
     }
-    return x;
+    return x
 }
 
 new Benchmark.Suite()
