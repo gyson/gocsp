@@ -25,10 +25,14 @@ var chan2 = new go.Channel()
 
 go(function* () {
     // sleep for 1 second
-    yield go.sleep(1000)
+    yield cb => setTimeout(cb, 1000)
 
     // read file
     var file = yield cb => fs.readFile(__filename, 'utf8', cb)
+
+    // check if file exaists
+    yield cb => fs.exists('path', x => cb(null, x))
+    yield cb => fs.exists('path', cb.bind(null, null))
 
     // take an item from Channel
     yield go.take(chan1)
@@ -46,6 +50,13 @@ go(function* () {
             // ...
         })
         .timeout(1000)
+    )
+
+    // TODO: channel / stream API
+    var fs = require('gocsp-fs')
+    yield go.link(
+        fs.openRead('path'),
+        fs.openWrite('path')
     )
 })()
 ```
