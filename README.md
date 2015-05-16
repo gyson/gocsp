@@ -1,12 +1,10 @@
 ## Communication Sequencial Processes in Javascript
 
-Bring golang-like CSP channel and coroutine to Javascript by using generator (ES6)
-
-## Install
-
-    $ npm install gocsp
+Bring golang-like CSP channel and coroutine to Javascript
 
 ## Run
+
+Some modules require new features from ES6.
 
     $ node --harmony <file>.js
 
@@ -14,12 +12,30 @@ Bring golang-like CSP channel and coroutine to Javascript by using generator (ES
 
 ```js
 import { readFile, exists } from 'fs'
-import { co, take, put, select, link } from 'gocsp'
+import { go, select, chan } from 'gocsp'
 
-var chan1 = new go.Channel()
-var chan2 = new go.Channel()
+var ch1 = chan()
+var ch2 = chan()
 
-co(function* () {
+// go(function* () {
+//
+// })
+
+go = function (fn) {
+    return go.wrap(fn)() // make sure it always
+}
+go.wrap = Promise.coroutine
+
+// go.wrap()
+// go(function* () {
+//
+// })
+
+Promise.coroutine(function (fn, ctx, args) {
+    return yield* fn
+})
+
+go(function* () {
     // sleep for 1 second
     yield cb => setTimeout(cb, 1000)
 
@@ -57,14 +73,17 @@ co(function* () {
 })()
 ```
 
-## Resource
+## Modules:
 
-* https://github.com/Gozala/channel
-* https://github.com/visionmedia/co
-* https://github.com/olahol/node-csp
-* http://swannodette.github.io/2013/08/24/es6-generators-and-csp
-* http://golang.org/
-* http://en.wikipedia.org/wiki/Communicating_sequential_processes
+## [gocsp/thunk](https://github.com/gyson/gocsp/doc/thunk.md)
+## [gocsp/go](https://github.com/gyson/gocsp/doc/go.md)
+## [gocsp/all](https://github.com/gyson/gocsp/doc/all.md)
+
+# Related packages:
+* [gocsp-fs](https://github.com/gyson/gocsp-fs)
+* [gocsp-net]
+* [gocsp-http]
+* [gocsp-readline](https://github.com/gyson/gocsp-readline)
 
 ## License
 

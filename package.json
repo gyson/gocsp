@@ -3,6 +3,9 @@
   "version": "0.0.4",
   "description": "CSP channel and coroutine in Javascript",
   "main": "./index.js",
+  "scripts": {
+    "test": "node --harmony test/index"
+  },
   "repository": {
     "type": "git",
     "url": "http://github.com/gyson/gocsp.git"
@@ -17,6 +20,12 @@
   "bugs": {
     "url": "https://github.com/gyson/gocsp/issues"
   },
-  "devDependencies": {},
-  "dependencies": {}
+  "devDependencies": {
+    "bluebird": "^2.8.1",
+    "tape": "^3.0.3"
+  },
+  "dependencies": {
+    "link-list": "0.0.4",
+    "transy": "0.0.4"
+  }
 }
