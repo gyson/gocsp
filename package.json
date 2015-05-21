@@ -21,11 +21,9 @@
     "url": "https://github.com/gyson/gocsp/issues"
   },
   "devDependencies": {
-    "bluebird": "^2.8.1",
     "tape": "^3.0.3"
   },
   "dependencies": {
-    "link-list": "0.0.4",
-    "transy": "0.0.4"
+    "bluebird": "^2.9.25"
   }
 }
