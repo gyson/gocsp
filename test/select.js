@@ -1,131 +1,140 @@
 'use strict';
 
 var test = require('tape')
-var go = require('../go')
-var thunk = require('../thunk')
-var select = require('../select')
-var Channel = require('../channel')
-var timeout = require('../timeout')
+var wrap = require('bluebird').coroutine
+var csp = require('..')
 
-test('select array', function (t) {
+test('select chan', wrap(function* (t) {
+
+    var ch1 = csp.chan()
+    var ch2 = csp.chan()
+
+    setTimeout(function () {
+        csp.put(ch1, 123)
+    }, 50)
+
+    setTimeout(function () {
+        csp.put(ch2, 456)
+    }, 100)
 
     var arr = []
 
-    arr.push(thunk(function (cb) {
-        setTimeout(function () {
-            cb(null, 1)
-        }, 10)
-    }))
-
-    arr.push(thunk(function (cb) {
-        setTimeout(function () {
-            cb(null, 2)
-        }, 20)
-    }))
-
-    arr.push(thunk(function (cb) {
-        setTimeout(function () {
-            cb(null, 3)
-        }, 30)
-    }))
-
-    select(function (s) {
-        for (var i = 0; i < arr.length; i++) {
-            var res = s(arr[i], function (_, val) {
-                t.equal(val, 1)
-                t.end()
+    for (var i = 0; i < 2; i++) {
+        yield csp.select(function (s) {
+            s.take(ch1, function (x) {
+                t.equal(x.done, false)
+                arr.push(x.value)
             })
-            if (res) {
-                return
-            }
-        }
-    })
-})
+            ||
+            s.take(ch2, function (x) {
+                t.equal(x.done, false)
+                arr.push(x.value)
+            })
+        })
+    }
+
+    t.deepEqual(arr, [123, 456])
+
+    t.end()
+}))
 
 test('select channel', function (t) {
     t.plan(2)
 
-    var chan1 = new Channel()
-    var chan2 = new Channel()
+    var chan1 = csp.chan()
+    var chan2 = csp.chan()
 
-    go(function* () {
-        yield select(function (s) {
-            s(chan1.take())
+    wrap(function* () {
+        yield csp.select(function (s) {
+            s.take(chan1)
             ||
-            s(chan2.take(), function (err, res) {
-                t.equal(res.value, 2)
+            s.take(chan2, function (x) {
+                t.equal(x.value, 2)
             })
         })
-    })
-    chan2.put(2)
+    })()
+    csp.put(chan2, 2)
 
-    go(function* () {
-        yield select(function (s) {
-            s(chan1.take(), function (err, res) {
-                t.equal(res.value, 1)
+    wrap(function* () {
+        yield csp.select(function (s) {
+            s.take(chan1, function (x) {
+                t.equal(x.value, 1)
             })
             ||
-            s(chan2.take())
+            s.take(chan2)
         })
-    })
-    chan1.put(1)
+    })()
+    csp.put(chan1, 1)
 })
 
 
-test('nested-select', function (t) {
+test('nested-select', wrap(function* (t) {
     t.plan(4)
 
-    var chan = new Channel()
+    var ch = csp.chan()
 
-    chan.put(1)
-    chan.put(2)
-    chan.put(3)
-    chan.put(4)
+    csp.put(ch, 1)
+    csp.put(ch, 2)
+    csp.put(ch, 3)
+    csp.put(ch, 4)
 
-    go(function* () {
-        yield select(function (s) {
-            s(chan.take(), function* (_, res) {
+    yield csp.select(function (s) {
+        s.take(ch, wrap(function* (res) {
 
-                t.equal(res.value, 1)
+            t.equal(res.value, 1)
 
-                yield select(function (s) {
-                    s(chan.take(), function* (_, res) {
+            yield csp.select(function (s) {
+                s.take(ch, wrap(function* (res) {
 
-                        t.equal(res.value, 2)
+                    t.equal(res.value, 2)
 
-                        yield select(function (s) {
-                            s(chan.take(), function* (_, res) {
+                    yield csp.select(function (s) {
+                        s.take(ch, wrap(function* (res) {
 
-                                t.equal(res.value, 3)
+                            t.equal(res.value, 3)
 
-                                yield select(function (s) {
-                                    s(chan.take(), function* (_, res) {
+                            yield csp.select(function (s) {
+                                s.take(ch, wrap(function* (res) {
 
-                                        t.equal(res.value, 4)
+                                    t.equal(res.value, 4)
 
-                                    })
-                                })
+                                }))
                             })
-                        })
+                        }))
                     })
-                })
+                }))
             })
-        })
+        }))
     })
-})
 
-test('select timeout', go.wrap(function* (t) {
-    t.plan(1)
-    yield select(function (s) {
-        s(go(function* () {
-            yield timeout(50)
-            return 123
-        }), function (_, val) {
-            t.equal(val, 123)
-        })
-        ||
-        s(timeout(100), function () {
-            console.log('should not reach here')
+    t.end()
+}))
+
+test('select timeout', wrap(function* (t) {
+    // t.plan(1)
+    var bool = true
+
+    setTimeout(function () {
+        bool = false
+    }, 150)
+
+    yield csp.select(function (s) {
+        s.timeout(100, function () {
+            t.equal(bool, true)
         })
     })
+
+    t.end()
+}))
+
+test('select default', wrap(function* (t) {
+
+    t.end()
+}))
+
+test('select multiple', wrap(function* (t) {
+    // ...
+    // ...
+
+    t.end()
 }))

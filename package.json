@@ -2,7 +2,7 @@
   "name": "gocsp",
   "version": "0.0.4",
   "description": "CSP channel and coroutine in Javascript",
-  "main": "./index.js",
+  "main": "./lib/index.js",
   "scripts": {
     "test": "node --harmony test/index"
   },
