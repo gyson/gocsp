@@ -132,6 +132,23 @@ test('select default', wrap(function* (t) {
     t.end()
 }))
 
+test('select short cut', wrap(function* (t) {
+
+    var ch1 = csp.chan()
+    var ch2 = csp.chan()
+
+    csp.put(ch1, 'hello')
+
+    yield csp.select(function (s) {
+        s.take(ch1, function (res) {
+            t.equal(res.value, 'hello')
+        })
+        ||
+        s.take(t.fail('should not call this'))
+    })
+    t.end()
+}))
+
 test('select multiple', wrap(function* (t) {
     // ...
     // ...
