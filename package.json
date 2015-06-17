@@ -1,6 +1,6 @@
 {
   "name": "gocsp",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "description": "Golang-like CSP channel in Javascript",
   "main": "./lib/index.js",
   "scripts": {
