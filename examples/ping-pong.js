@@ -1,11 +1,11 @@
 'use strict';
 
+var co = require('co')
 var csp = require('..')
-var Promise = require('bluebird')
 
 // from http://talks.golang.org/2013/advconc.slide#6
 
-var player = Promise.coroutine(function* (name, ch) {
+var player = co.wrap(function* (name, ch) {
     for (;;) {
         var ball = (yield csp.take(ch)).value
         ball += 1
@@ -15,7 +15,7 @@ var player = Promise.coroutine(function* (name, ch) {
     }
 })
 
-Promise.coroutine(function* () {
+co(function* () {
     var ch = csp.chan()
 
     player('ping', ch)
@@ -24,4 +24,4 @@ Promise.coroutine(function* () {
     yield csp.put(ch, 0)
     yield csp.timeout(1000)
     yield csp.take(ch)
-})()
+})

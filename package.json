@@ -1,7 +1,7 @@
 {
   "name": "gocsp",
   "version": "0.0.4",
-  "description": "CSP channel and coroutine in Javascript",
+  "description": "Golang-like CSP channel in Javascript",
   "main": "./lib/index.js",
   "scripts": {
     "test": "node --harmony test/index"
@@ -21,6 +21,7 @@
     "url": "https://github.com/gyson/gocsp/issues"
   },
   "devDependencies": {
+    "co": "^4.5.4",
     "tape": "^3.0.3"
   },
   "dependencies": {
